@@ -3,14 +3,14 @@ import createReactClass from 'create-react-class';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import AssignCell from '../students/assign_cell.jsx';
+import AssignCell from '../../students/assign_cell.jsx';
 import MyAssignmentsList from './my_assignments_list.jsx';
-import { fetchAssignments } from '../../actions/assignment_actions';
+import { fetchAssignments } from '../../../actions/assignment_actions';
 import {
   ASSIGNED_ROLE, REVIEWING_ROLE,
   IMPROVING_ARTICLE, NEW_ARTICLE, REVIEWING_ARTICLE
-} from '../../constants/assignments';
-import { groupByAssignmentType } from '../util/helpers';
+} from '../../../constants/assignments';
+import { groupByAssignmentType } from '../../util/helpers';
 
 export const MyArticles = createReactClass({
   displayName: 'MyArticles',
@@ -31,7 +31,7 @@ export const MyArticles = createReactClass({
 
   getList(assignments, currentUserId, ROLE) {
     return assignments.reduce((acc, { article_title, role, user_id, username }) => {
-      if (role === ROLE || user_id === currentUserId) return acc;
+      if (!user_id || role === ROLE || user_id === currentUserId) return acc;
       if (acc[article_title]) {
         acc[article_title].push(username);
       } else {
@@ -68,12 +68,12 @@ export const MyArticles = createReactClass({
 
     if (assignment.role === ASSIGNED_ROLE) {
       if (!assignment.article_id) {
-        result.status = NEW_ARTICLE;
+        result.article_status = NEW_ARTICLE;
       } else {
-        result.status = IMPROVING_ARTICLE;
+        result.article_status = IMPROVING_ARTICLE;
       }
     } else {
-      result.status = REVIEWING_ARTICLE;
+      result.article_status = REVIEWING_ARTICLE;
     }
 
     return result;
@@ -129,23 +129,12 @@ export const MyArticles = createReactClass({
     } = groupByAssignmentType(assignments, user_id);
 
     const all = assigned.concat(reviewing).map(this.addAssignmentCategory);
-    const assignmentCount = all.length;
-
-    let findYourArticleTraining;
-    if (Features.wikiEd && !assignmentCount) {
-      findYourArticleTraining = (
-        <a href="/training/students/finding-your-article" target="_blank" className="button ghost-button small">
-          How to find an article
-        </a>
-      );
-    }
 
     return (
       <div className="module my-articles">
         <div className="section-header my-articles-header">
           <h3>{I18n.t('courses.my_articles')}</h3>
           <div className="controls">
-            {findYourArticleTraining}
             <AssignCell
               assignments={assigned}
               editable

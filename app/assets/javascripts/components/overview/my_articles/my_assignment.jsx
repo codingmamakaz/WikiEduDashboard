@@ -2,18 +2,21 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import MainspaceChecklist from '../common/mainspace_checklist.jsx';
-import FinalArticleChecklist from '../common/final_article_checklist.jsx';
-import PeerReviewChecklist from '../common/peer_review_checklist.jsx';
-import CourseUtils from '../../utils/course_utils.js';
-import Feedback from '../common/feedback.jsx';
+import MainspaceChecklist from '../../common/mainspace_checklist.jsx';
+import FinalArticleChecklist from '../../common/final_article_checklist.jsx';
+import PeerReviewChecklist from '../../common/peer_review_checklist.jsx';
+import CourseUtils from '../../../utils/course_utils.js';
+import Feedback from '../../common/feedback.jsx';
+import Wizard from './my_articles_wizard.jsx';
 
-import { initiateConfirm } from '../../actions/confirm_actions';
-import { deleteAssignment } from '../../actions/assignment_actions';
+import { initiateConfirm } from '../../../actions/confirm_actions';
+import { deleteAssignment, fetchAssignments, updateAssignmentStatus } from '../../../actions/assignment_actions';
 
-import { NEW_ARTICLE, REVIEWING_ROLE } from '../../constants/assignments';
+import { NEW_ARTICLE, REVIEWING_ROLE } from '../../../constants/assignments';
 
 // Helper Components
+const Separator = () => <span> •&nbsp;</span>;
+
 // Actions Components
 const RemoveButton = ({ assignment, unassign }) => (
   <div>
@@ -26,6 +29,30 @@ const RemoveButton = ({ assignment, unassign }) => (
   </div>
 );
 
+const MarkAsIncompleteButton = ({
+  assignment, courseSlug,
+  handleUpdateAssignment, refreshAssignments // functions
+}) => {
+  const update = async () => {
+    const statuses = assignment.assignment_all_statuses;
+    const prev = statuses[statuses.length - 2];
+
+    await handleUpdateAssignment(assignment, prev);
+    await refreshAssignments(courseSlug);
+  };
+
+  return (
+    <div>
+      <button
+        className="button danger small"
+        onClick={update}
+      >
+        Mark as Incomplete
+      </button>
+    </div>
+  );
+};
+
 const PageViews = ({ article }) => {
   const pageviewUrl = `https://tools.wmflabs.org/pageviews/?project=${article.language}.${article.project}.org&platform=all-access&agent=user&range=latest-90&pages=${article.title}`;
   return (
@@ -36,8 +63,8 @@ const PageViews = ({ article }) => {
 };
 
 const Actions = ({
-  article, assignment, current_user, username,
-  isEnglishWikipedia, unassign
+  article, assignment, courseSlug, current_user, isComplete, username,
+  isEnglishWikipedia, handleUpdateAssignment, refreshAssignments, unassign
 }) => {
   const actions = [];
 
@@ -62,6 +89,20 @@ const Actions = ({
     } else {
       actions.push(<PeerReviewChecklist key="peer-review-button" />);
     }
+  }
+
+  if (isComplete) {
+    return (
+      <section className="actions">
+        <MarkAsIncompleteButton
+          key="mark-incomplete-button"
+          assignment={assignment}
+          courseSlug={courseSlug}
+          handleUpdateAssignment={handleUpdateAssignment}
+          refreshAssignments={refreshAssignments}
+        />
+      </section>
+    );
   }
 
   return (
@@ -115,8 +156,6 @@ const SandboxLink = ({ assignment }) => {
     </a>
   );
 };
-
-const Separator = () => <span> •&nbsp;</span>;
 
 const Links = ({ articleTitle, assignment, current_user }) => {
   const { article_url, editors, id, reviewers, sandboxUrl } = assignment;
@@ -180,6 +219,13 @@ export const MyAssignment = createReactClass({
     wikidataLabels: PropTypes.object.isRequired
   },
 
+  isComplete() {
+    const { assignment } = this.props;
+    const allStatuses = assignment.assignment_all_statuses;
+    const lastStatus = allStatuses[allStatuses.length - 1];
+    return assignment.assignment_status === lastStatus;
+  },
+
   isEnglishWikipedia() {
     if (this.props.course.home_wiki.language === 'en' && this.props.course.home_wiki.project === 'wikipedia') {
       if (typeof this.props.assignment.language === 'undefined') {
@@ -206,21 +252,33 @@ export const MyAssignment = createReactClass({
     let articleTitle = assignment.article_title;
     articleTitle = CourseUtils.formattedArticleTitle(article, course.home_wiki, label);
 
+    const isComplete = this.isComplete();
     return (
-      <div className="my-assignment mb1">
-        <Links
-          articleTitle={articleTitle}
-          assignment={assignment}
-          current_user={current_user}
-        />
-        <Actions
-          article={article}
-          assignment={assignment}
-          current_user={current_user}
-          username={username}
-          isEnglishWikipedia={this.isEnglishWikipedia}
-          unassign={this.unassign}
-        />
+      <div className={`my-assignment mb1${isComplete ? ' complete' : ''}`}>
+        <header className="header-wrapper">
+          <Links
+            articleTitle={articleTitle}
+            assignment={assignment}
+            current_user={current_user}
+          />
+          <Actions
+            article={article}
+            assignment={assignment}
+            courseSlug={course.slug}
+            current_user={current_user}
+            isEnglishWikipedia={this.isEnglishWikipedia}
+            isComplete={isComplete}
+            refreshAssignments={this.props.fetchAssignments}
+            unassign={this.unassign}
+            handleUpdateAssignment={this.props.updateAssignmentStatus}
+            username={username}
+          />
+        </header>
+        {
+          isComplete
+          ? <section className="completed-assignment">{'You\'ve marked your article as complete.'}</section>
+          : <Wizard assignment={assignment} courseSlug={course.slug} />
+        }
       </div>
     );
   }
@@ -228,7 +286,9 @@ export const MyAssignment = createReactClass({
 
 const mapDispatchToProps = {
   initiateConfirm,
-  deleteAssignment
+  deleteAssignment,
+  fetchAssignments,
+  updateAssignmentStatus
 };
 
 export default connect(null, mapDispatchToProps)(MyAssignment);
