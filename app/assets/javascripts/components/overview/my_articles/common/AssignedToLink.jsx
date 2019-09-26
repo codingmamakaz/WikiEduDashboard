@@ -1,7 +1,5 @@
 import React from 'react';
-
-// Helper Components
-export const Separator = () => <span> •&nbsp;</span>;
+import PropTypes from 'prop-types';
 
 export const AssignedToLink = ({ name, members }) => {
   if (!members) return null;
@@ -21,10 +19,10 @@ export const AssignedToLink = ({ name, members }) => {
   return [label].concat(links);
 };
 
-export const EditorLink = ({ editors }) => {
-  return <AssignedToLink members={editors} name="editors" />;
+AssignedToLink.propTypes = {
+  // props
+  name: PropTypes.string.isRequired,
+  members: PropTypes.array
 };
 
-export const ReviewerLink = ({ reviewers }) => {
-  return <AssignedToLink members={reviewers} name="reviewers" />;
-};
+export default AssignedToLink;
