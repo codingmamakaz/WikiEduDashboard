@@ -52,7 +52,10 @@
     text-align right
     *
       margin-left 3px
-  .toggle-wizard
+  .progress-tracker
+    display flex
+    flex-direction column-reverse
+  .toggle-progress-tracker
     background #EDEDED
     color rgba(100,100,100,0.6)
     cursor pointer
@@ -74,12 +77,9 @@
         &.selected
           color rgb(103, 110, 180)
           font-weight bold
-
   .flow
     border-top 1px solid #EDEDED
     display flex
-    &.hidden
-      display none
     .step
       align-items center
       border-right 1px solid rgb(225,225,225)
