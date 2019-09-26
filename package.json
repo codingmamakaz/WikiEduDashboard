@@ -3,11 +3,11 @@
   "repository": "https://github.com/WikiEducationFoundation/WikiEduDashboard",
   "license": "MIT",
   "dependencies": {
-    "@babel/core": "^7.5.5",
+    "@babel/core": "^7.6.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.5.4",
     "@babel/plugin-transform-modules-commonjs": "^7.6.0",
     "@babel/polyfill": "^7.6.0",
-    "@babel/preset-env": "^7.5.5",
+    "@babel/preset-env": "^7.6.0",
     "@babel/preset-react": "^7.0.0",
     "@babel/register": "^7.6.0",
     "@bower_components/jquery": "jquery/jquery-dist#3.4.1",
@@ -47,7 +47,7 @@
     "gulp-eslint": "^6.0.0",
     "gulp-iconfont": "^10.0.3",
     "gulp-imagemin": "^6.1.0",
-    "gulp-livereload": "^4.0.1",
+    "gulp-livereload": "^4.0.2",
     "gulp-load-plugins": "^2.0.1",
     "gulp-newer": "^1.4.0",
     "gulp-notify": "^3.2.0",
@@ -59,7 +59,7 @@
     "gulp-stylus": "^2.7.0",
     "gulp-uglify": "^3.0.2",
     "gulp-util": "^3.0.6",
-    "history": "4.9.0",
+    "history": "4.10.1",
     "i18n-js": "^3.3.0",
     "isomorphic-fetch": "^2.2.1",
     "jeet": "^7.2.0",
@@ -94,6 +94,7 @@
     "react": "^16.9.0",
     "react-burger-menu": "2.6.11",
     "react-confetti": "^4.0.1",
+    "react-cookie-consent": "^2.5.0",
     "react-day-picker": "7.3.2",
     "react-dnd": "^3.0.2",
     "react-dnd-html5-backend": "^5.0.1",
@@ -134,7 +135,7 @@
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0",
     "webpack": "^4.40.2",
-    "webpack-dev-server": "^3.8.0",
+    "webpack-dev-server": "^3.8.1",
     "webpack-manifest-plugin": "2.0.4",
     "wnumb": "^1.1.0"
   },
@@ -161,7 +162,7 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.6.0",
-    "webpack-cli": "^3.3.8"
+    "webpack-cli": "^3.3.9"
   },
   "resolutions": {
     "babel-core": "7.0.0-bridge.0"
