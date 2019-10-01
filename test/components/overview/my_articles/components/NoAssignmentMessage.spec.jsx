@@ -7,12 +7,12 @@ import NoAssignmentMessage from '../../../../../app/assets/javascripts/component
 describe('NoAssignmentMessage', () => {
   const component = shallow(<NoAssignmentMessage />);
   it('should render', () => {
-    expect(component.find('.no-assignment-message'));
+    expect(component).toMatchSnapshot();
   });
   it('should include a link on how to find an article', () => {
-    expect(component.find('a').contains('How to find an article')).to.be.ok;
+    expect(component.find('a').contains('How to find an article')).toBeTruthy;
   });
   it('should include a link on evaluating articles and sources', () => {
-    expect(component.find('a').contains('Evaluating articles and sources')).to.be.ok;
+    expect(component.find('a').contains('Evaluating articles and sources')).toBeTruthy;
   });
 });
